@@ -1,0 +1,2 @@
+# duckdb_pygwalker
+DuckDBとpygwalkerを使ってデータ分析ツールを作りたい
