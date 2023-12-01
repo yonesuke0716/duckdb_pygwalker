@@ -1,18 +1,4 @@
-import duckdb
 import time
-
-
-# duckdbのDBを作成する関数
-def create_duckdb(db_name):
-    # DB の作成
-    conn = duckdb.connect(f"duckdb/{db_name}.duckdb", read_only=False)
-    c = conn.cursor()
-
-    # CSV からデータをインポートしてテーブルを作成
-    c.execute(f"CREATE TABLE wine AS SELECT * FROM read_csv_auto('csv/{db_name}.csv');")
-
-    # DuckDBとの接続を閉じる
-    c.close()
 
 
 # 演出用のロード画面

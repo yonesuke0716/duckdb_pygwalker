@@ -5,8 +5,10 @@ from sklearn.datasets import load_iris, load_wine
 from pygwalker.api.streamlit import init_streamlit_comm, get_streamlit_html
 import streamlit as st
 import streamlit.components.v1 as components
+import duckdb
 
-from libs.utils import create_duckdb, display_loadtime
+from libs.utils import display_loadtime
+from libs.sql import create_table
 
 # ディレクトリを作成する
 os.makedirs("duckdb", exist_ok=True)
@@ -23,32 +25,39 @@ def get_pyg_html(df: pd.DataFrame) -> str:
 
 
 # Streamlitページの幅を調整する
-st.set_page_config(page_title="StreamlitでPygwalkerを使う", layout="wide")
+st.set_page_config(page_title="AdventCalender2023_Aidemy_yonekura", layout="wide")
 
 # PyGWalkerとStreamlitの通信を確立する
 init_streamlit_comm()
 
-st.title("DuckDB+pygwalkerによるデータ分析基盤")
+st.title("DuckDB+pygwalkerで、データ分析基盤作ってみた")
+
+con = duckdb.connect()
 
 # DWHの作成(scikit-learn -> duckdb)
-display_loadtime(st, "Irisデータをロード中...")
+# irisデータをロード
+# display_loadtime(st, "Irisデータをロード中...")
 iris = load_iris()
 iris_data = pd.DataFrame(data=iris.data, columns=iris.feature_names)
 iris_data["target"] = iris.target
-iris_data.to_csv("csv/iris.csv", index=False)
-if not os.path.isfile("duckdb/iris.duckdb"):
-    create_duckdb("iris")
+# テーブルの作成
+# create_table(conn, "iris", iris_data)
+duckdb.sql("SELECT * FROM iris_data")
 
-display_loadtime(st, "Wineデータをロード中...")
+# wineデータをロード
+# display_loadtime(st, "Wineデータをロード中...")
 wine = load_wine()
 wine_data = pd.DataFrame(data=wine.data, columns=wine.feature_names)
 wine_data["target"] = wine.target
-wine_data.to_csv("csv/wine.csv", index=False)
-if not os.path.isfile("duckdb/wine.duckdb"):
-    create_duckdb("wine")
+# テーブルの作成
+# create_table(conn, "wine", wine_data)
+duckdb.sql("SELECT * FROM wine_data")
 
 # DMの作成(duckdb -> pandas)
+table_name = st.selectbox("テーブルを選択してください", ["iris", "wine"])
+# テーブルの読み込み
+read_df = con.execute(f"SELECT * FROM {table_name}_data").fetchdf()
+st.header(table_name)
 
-
-# BI機能の作成(pandas -> pygwalker+streamlit)
-components.html(get_pyg_html(wine_data), width=1300, height=1000, scrolling=True)
+# BI機能の作成(pandas -> pygwalker)
+components.html(get_pyg_html(read_df), width=1300, height=1000, scrolling=True)
