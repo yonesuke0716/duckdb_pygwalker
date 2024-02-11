@@ -25,4 +25,4 @@ streamlit run duckdb_ver.py
 
 以下のブログで紹介。
 
-https://zenn.dev/articles/3aeea1470f1535/
+https://zenn.dev/aidemy/articles/3aeea1470f1535
